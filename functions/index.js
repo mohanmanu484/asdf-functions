@@ -17,8 +17,6 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
     response.send("done");
   });
-
-
 });
 
 
@@ -36,16 +34,17 @@ exports.sendNotification = functions.https.onRequest((req, res) => {
 exports.sendWelcomeEmail = functions.auth.user().onCreate(event => {
 
   const user = event.data; // The Firebase user.
-  const email = user.email; // The email of the user.
-  var displayName = user.displayName; // The display name of the user
-  const uId = user.uid;
+  const user_email = user.email; // The email of the user.
+  const user_name = user.displayName || email.split("@")[0]; // The display name of the user
+  const user_id = user.uid;
+  const user_profile = user.displayName || "https://firebasestorage.googleapis.com/v0/b/functions-45d0d.appspot.com/o/default_profile.png?alt=media&token=3ca09698-087c-4e43-ac50-b63e5e30afc7";
 
-  if (!displayName) {
-    displayName = email.split("@")[0];
-  }
-  return admin.database().ref(`/users/${uId}`).set({
-    "email": email,
-    "name": displayName
+  return admin.database().ref(`/users/${user_id}`).set({
+    "general": {
+      "user_email": user_email,
+      "user_name": user_name
+    },
+    "user_photo_url": user_profile
   });
 
 });
